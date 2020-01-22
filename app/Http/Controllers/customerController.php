@@ -13,10 +13,19 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class customerController extends Controller
 {
-    
+    private function validateRequest(){
+
+        return request()->validate([
+            'name' =>'required|min:3',
+            'email' =>'required|email',
+            'active' =>'required',
+            'company_id'=>'required',
+            'image' => 'sometimes|file|image|max:5000'
+        ]) ;
+    }
     public function index(){
 
-        $customers = Customer::with('company')->paginate(12); ///so that it done't make extra query
+        $customers = Customer::with('company')->paginate(12); ///so that it didn't make extra query
         return view('customers/index' , compact('customers'));
 
     }
@@ -24,7 +33,7 @@ class customerController extends Controller
     public function create(){
         $companies = Company::all();
         $customer = new Customer();
-        return \view('customers.create' , \compact('companies' , 'customer'));
+        return \view('customers.create' , \compact('companies' ,'customer'));
     }
 
     public function store(){
@@ -63,16 +72,7 @@ class customerController extends Controller
         return \redirect('customers');
     }
 
-    private function validateRequest(){
 
-        return request()->validate([
-            'name' =>'required|min:3',
-            'email' =>'required|email',
-            'active' =>'required',
-            'company_id'=>'required',
-            'image' => 'sometimes|file|image|max:5000'
-        ]) ;
-    }
 
     private function storeImage($customer){
         if(request()->has('image')){
